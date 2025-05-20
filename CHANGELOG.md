@@ -4,7 +4,7 @@ Notable changes to this project are documented in this file.
 ## [4.10.0] - (? 2025 - [4.10.0 changes])
 
 ## [4.9.0] - (May 2025 - [4.9.0 changes])
-- Updates baseline to upstream SQLite 3.46.2
+- Updates baseline to upstream SQLite 3.49.2
 - Removes use of static mutex in `sqlcipher_extra_shutdown()`
  
 ## [4.8.0] - (April 2025 - [4.8.0 changes])
