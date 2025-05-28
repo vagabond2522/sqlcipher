@@ -276,6 +276,10 @@ static volatile sqlite3_mem_methods default_mem_methods;
 static sqlcipher_provider *default_provider = NULL;
 
 static sqlite3_mutex* sqlcipher_static_mutex[SQLCIPHER_MUTEX_COUNT];
+
+#ifndef SQLCIPHER_LOG_LEVEL_DEFAULT
+#define SQLCIPHER_LOG_LEVEL_DEFAULT SQLCIPHER_LOG_WARN
+#endif
 static FILE* sqlcipher_log_file = NULL;
 static volatile int sqlcipher_log_device = 0;
 static volatile unsigned int sqlcipher_log_level = SQLCIPHER_LOG_NONE;
@@ -440,7 +444,7 @@ int sqlcipher_extra_init(const char* arg) {
 
     /* set log level if it is different than the uninitalized default value of NONE */ 
     if(sqlcipher_log_level == SQLCIPHER_LOG_NONE) {
-      sqlcipher_log_level = SQLCIPHER_LOG_WARN;
+      sqlcipher_log_level = SQLCIPHER_LOG_LEVEL_DEFAULT;
     }
 
     /* set the default file or device if neither is already set */
