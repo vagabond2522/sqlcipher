@@ -53,16 +53,14 @@ static const char* sqlcipher_cc_get_provider_name(void *ctx) {
 
 static const char* sqlcipher_cc_get_provider_version(void *ctx) {
 #if TARGET_OS_MAC
-  CFTypeRef version;
   CFBundleRef bundle = CFBundleGetBundleWithIdentifier(CFSTR("com.apple.security"));
-  if(bundle == NULL) {
-    return "unknown";
+  CFTypeRef bundle_ver;
+  if(bundle && (bundle_ver = CFBundleGetValueForInfoDictionaryKey(bundle, kCFBundleVersionKey))) {
+    const char *ver = CFStringGetCStringPtr(bundle_ver, kCFStringEncodingUTF8);
+    if(ver) return ver;
   }
-  version = CFBundleGetValueForInfoDictionaryKey(bundle, CFSTR("CFBundleShortVersionString"));
-  return CFStringGetCStringPtr(version, kCFStringEncodingUTF8);
-#else
-  return "unknown";
 #endif
+  return "unknown";
 }
 
 static int sqlcipher_cc_hmac(
