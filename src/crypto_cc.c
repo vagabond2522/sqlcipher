@@ -53,13 +53,29 @@ static const char* sqlcipher_cc_get_provider_name(void *ctx) {
 
 static const char* sqlcipher_cc_get_provider_version(void *ctx) {
 #if TARGET_OS_MAC
+  /* macOS uses com.apple.security with a lowercase s */
   CFBundleRef bundle = CFBundleGetBundleWithIdentifier(CFSTR("com.apple.security"));
   CFTypeRef bundle_ver;
-  if(bundle && (bundle_ver = CFBundleGetValueForInfoDictionaryKey(bundle, kCFBundleVersionKey))) {
-    const char *ver = CFStringGetCStringPtr(bundle_ver, kCFStringEncodingUTF8);
-    if(ver) return ver;
+  const char *ver;
+
+  /* if the bundle wasn't identified, try secrurity with a capial S (works for iOS) */
+  if(!bundle) {
+    bundle = CFBundleGetBundleWithIdentifier(CFSTR("com.apple.Security"));
   }
+
+  /* If the bundle was resolved, retrieve the bundle version key then attempt to convert it to a C string.
+   * Note that it is possible for CFStringGetCString to return NULL (this is warned against extensively in the
+   * header), so  only return a value if the conversion was successful. */
+  if(
+    bundle
+    && (bundle_ver = CFBundleGetValueForInfoDictionaryKey(bundle, kCFBundleVersionKey))
+    && (ver = CFStringGetCStringPtr(bundle_ver, kCFStringEncodingUTF8))
+  ) {
+   return ver;
+  }
+
 #endif
+  /* unable to detect the CoreCrypto version, return a fixed string "unknown" */
   return "unknown";
 }
 
