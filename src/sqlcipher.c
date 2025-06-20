@@ -388,21 +388,26 @@ static void sqlcipher_fini(void) {
 }
 
 #if defined(_WIN32)
-#ifndef SQLCIPHER_OMIT_DLLMAIN
-BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
-  switch (fdwReason) {
-    case DLL_PROCESS_DETACH:
-      sqlcipher_log(SQLCIPHER_LOG_DEBUG, SQLCIPHER_LOG_CORE, "%s: calling sqlcipher_extra_shutdown()", __func__);
-      sqlcipher_extra_shutdown();
-      break;
-    default:
-      break;
+  #ifndef SQLCIPHER_OMIT_DLLMAIN
+  BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
+    switch (fdwReason) {
+      case DLL_PROCESS_DETACH:
+        sqlcipher_log(SQLCIPHER_LOG_DEBUG, SQLCIPHER_LOG_CORE, "%s: calling sqlcipher_extra_shutdown()", __func__);
+        sqlcipher_extra_shutdown();
+        break;
+      default:
+        break;
+    }
+    return TRUE;
   }
-  return TRUE;
-}
-#endif
+  #endif
 #elif defined(__APPLE__)
-static void (*const sqlcipher_fini_func)(void) __attribute__((used, section("__DATA,__mod_term_func"))) = sqlcipher_fini;
+  #if !defined(__has_feature) || !__has_feature(address_sanitizer)
+  static void (*const sqlcipher_fini_func)(void) __attribute__((used, section("__DATA,__mod_term_func"))) = sqlcipher_fini;
+  #else
+  static void sqlcipher_cleanup_destructor(void) __attribute__((destructor));
+  static void sqlcipher_cleanup_destructor(void) { sqlcipher_fini(); }
+  #endif
 #else
 static void (*const sqlcipher_fini_func)(void) __attribute__((used, section(".fini_array"))) = sqlcipher_fini;
 #endif
