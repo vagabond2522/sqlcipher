@@ -1,7 +1,14 @@
 # SQLCipher Change Log
 Notable changes to this project are documented in this file.
 
-## [4.10.0] - (? 2025 - [4.10.0 changes])
+## [4.11.0] - (? 2025 - [4.11.0 changes])
+
+## [4.10.0] - (July 2025 - [4.10.0 changes])
+- Updates baseline to latest SQLite 3.50.3
+- Allows compile time override of default log level via `SQLCIPHER_LOG_LEVEL_DEFAULT` macro
+- Fixes issue building with `-fstanitize=address` on macOS
+- Fixes detection of CommonCrypto version on macOS
+- Improves CommonCrypto version detection on iOS
 
 ## [4.9.0] - (May 2025 - [4.9.0 changes])
 - Updates baseline to upstream SQLite 3.49.2
@@ -290,6 +297,8 @@ __BREAKING CHANGE__: `SELECT` statements (now also including schema independent 
 ### Security
 - Change KDF iteration length from 4,000 to 64,000
 
+[4.11.0]: https://github.com/sqlcipher/sqlcipher/tree/v4.11.0
+[4.11.0 changes]: https://github.com/sqlcipher/sqlcipher/compare/v4.10.0...v4.11.0
 [4.10.0]: https://github.com/sqlcipher/sqlcipher/tree/v4.10.0
 [4.10.0 changes]: https://github.com/sqlcipher/sqlcipher/compare/v4.9.0...v4.10.0
 [4.9.0]: https://github.com/sqlcipher/sqlcipher/tree/v4.9.0
