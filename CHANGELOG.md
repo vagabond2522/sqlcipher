@@ -3,8 +3,8 @@ Notable changes to this project are documented in this file.
 
 ## [4.11.0] - (? 2025 - [4.11.0 changes])
 
-## [4.10.0] - (July 2025 - [4.10.0 changes])
-- Updates baseline to latest SQLite 3.50.3
+## [4.10.0] - (August 2025 - [4.10.0 changes])
+- Updates baseline to SQLite 3.50.4
 - Allows compile time override of default log level via `SQLCIPHER_LOG_LEVEL_DEFAULT` macro
 - Fixes issue building with `-fstanitize=address` on macOS
 - Fixes detection of CommonCrypto version on macOS
