@@ -2266,6 +2266,43 @@ static int sqlcipher_codec_add_random(codec_ctx *ctx, const char *zRight, int ra
   return SQLITE_ERROR;
 }
 
+#if defined(_WIN32)
+/* On windows convert to utf-16 when writing to stderr or stdout to avoid
+ * a potential exception when writing mixed context to those streams
+ * when using the shell. */
+static int sqlcipher_fprintf(FILE* stream, const char* format, ...) {
+  int sz;
+  va_list ap;
+
+  if (stream == stderr || stream == stdout) {
+    char* buffer = NULL;
+    wchar_t* wbuffer = NULL;
+
+    va_start(ap, format);
+    buffer = sqlite3_vmprintf(format, ap);
+    va_end(ap);
+    sz = (int)strlen(buffer);
+
+    wbuffer = sqlite3_malloc((sz + 1) * sizeof(wchar_t));
+    if (wbuffer == NULL) return NULL;
+
+    sz = MultiByteToWideChar(CP_UTF8, 0, buffer, sz, wbuffer, sz);
+    wbuffer[sz] = NULL;
+    fputws(wbuffer, stream);
+
+    sqlite3_free(wbuffer);
+    sqlite3_free(buffer);
+  } else {
+    va_start(ap, format);
+    sz = vfprintf(stream, format, ap);
+    va_end(ap);
+  }
+  return sz;
+}
+#else
+#define sqlcipher_fprintf fprintf
+#endif
+
 #if !defined(SQLITE_OMIT_TRACE)
 
 #define SQLCIPHER_PROFILE_FMT        "Elapsed time:%.3f ms - %s\n"
@@ -2283,7 +2320,7 @@ static int sqlcipher_profile_callback(unsigned int trace, void *file, void *stmt
 #endif
 #endif
   } else {
-    fprintf(f, SQLCIPHER_PROFILE_FMT, elapsed, sqlite3_sql((sqlite3_stmt*)stmt));
+    sqlcipher_fprintf(f, SQLCIPHER_PROFILE_FMT, elapsed, sqlite3_sql((sqlite3_stmt*)stmt));
   }
   return SQLITE_OK;
 }
@@ -2387,8 +2424,9 @@ void sqlcipher_log(unsigned int level, unsigned int source, const char *message,
 
 #ifdef CODEC_DEBUG
 #if defined(SQLCIPHER_OMIT_LOG_DEVICE) || (!defined(__ANDROID__) && !defined(__APPLE__))
-    vfprintf(stderr, message, params);
-    fprintf(stderr, "\n");
+    sqlite3_vsnprintf(MAX_LOG_LEN, formatted, message, params);
+    sqlcipher_fprintf(stderr, formatted);
+    sqlcipher_fprintf(stderr, "\n");
     goto end;
 #else
 #if defined(__ANDROID__)
@@ -2447,7 +2485,7 @@ void sqlcipher_log(unsigned int level, unsigned int source, const char *message,
     localtime_r(&sec, &tt);
 #endif
     if(strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", &tt)) {
-      fprintf((FILE*)sqlcipher_log_file, "%s.%03d: %s\n", buffer, ms, formatted);
+      sqlcipher_fprintf((FILE*)sqlcipher_log_file, "%s.%03d: %s\n", buffer, ms, formatted);
       goto end;
     }
   }
