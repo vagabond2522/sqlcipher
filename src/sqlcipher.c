@@ -550,7 +550,7 @@ int sqlcipher_extra_init(const char* arg) {
     }
   }
 
-  default_provider->ctx_free(provider_ctx);
+  default_provider->ctx_free(&provider_ctx);
 
   sqlcipher_init = 1;
   sqlcipher_shutdown = 0;
