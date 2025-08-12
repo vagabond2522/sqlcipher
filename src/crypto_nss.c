@@ -265,7 +265,7 @@ static int sqlcipher_nss_cipher(
                              CKA_ENCRYPT, &keyItem, NULL);
   if (symKey == NULL) goto error;
   SECStatus rv;
-  if (mode == CIPHER_ENCRYPT) {
+  if (mode == SQLCIPHER_ENCRYPT) {
     rv = PK11_Encrypt(symKey, CKM_AES_CBC, &params, out, &outLen,
                       in_sz + 16, in, in_sz);
   } else {

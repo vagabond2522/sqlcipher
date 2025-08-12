@@ -232,7 +232,7 @@ static int sqlcipher_ltc_cipher(
 
   if((cipher_idx = find_cipher(LTC_CIPHER)) == -1) return SQLITE_ERROR;
   if((rc = cbc_start(cipher_idx, iv, key, key_sz, 0, &cbc)) != CRYPT_OK) return SQLITE_ERROR;
-  rc = mode == 1 ? cbc_encrypt(in, out, in_sz, &cbc) : cbc_decrypt(in, out, in_sz, &cbc);
+  rc = mode == SQLCIPHER_ENCRYPT ? cbc_encrypt(in, out, in_sz, &cbc) : cbc_decrypt(in, out, in_sz, &cbc);
   if(rc != CRYPT_OK) return SQLITE_ERROR;
   cbc_done(&cbc);
   return SQLITE_OK;

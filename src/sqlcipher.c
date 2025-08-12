@@ -106,9 +106,6 @@ void sqlite3pager_reset(Pager *pPager);
 #define CIPHER_VERSION_BUILD community
 #endif
 
-#define CIPHER_DECRYPT 0
-#define CIPHER_ENCRYPT 1
-
 #define CIPHER_READ_CTX 0
 #define CIPHER_WRITE_CTX 1
 #define CIPHER_READWRITE_CTX 2
@@ -1673,14 +1670,14 @@ static int sqlcipher_page_cipher(codec_ctx *ctx, int for_ctx, Pgno pgno, int mod
     goto error;
   } 
 
-  if(mode == CIPHER_ENCRYPT) {
+  if(mode == SQLCIPHER_ENCRYPT) {
     /* start at front of the reserve block, write random data to the end */
     if(ctx->provider->random(ctx->provider_ctx, iv_out, ctx->reserve_sz) != SQLITE_OK) goto error;
-  } else { /* CIPHER_DECRYPT */
+  } else { /* SQLCIPHER_DECRYPT */
     memcpy(iv_out, iv_in, ctx->iv_sz); /* copy the iv from the input to output buffer */
   } 
 
-  if(SQLCIPHER_FLAG_GET(ctx->flags, CIPHER_FLAG_HMAC) && (mode == CIPHER_DECRYPT)) {
+  if(SQLCIPHER_FLAG_GET(ctx->flags, CIPHER_FLAG_HMAC) && (mode == SQLCIPHER_DECRYPT)) {
     if(sqlcipher_page_hmac(ctx, c_ctx, pgno, in, size + ctx->iv_sz, hmac_out) != SQLITE_OK) {
       sqlcipher_log(SQLCIPHER_LOG_ERROR, SQLCIPHER_LOG_CORE, "%s: hmac operation on decrypt failed for pgno=%d", __func__, pgno);
       goto error;
@@ -1715,7 +1712,7 @@ static int sqlcipher_page_cipher(codec_ctx *ctx, int for_ctx, Pgno pgno, int mod
     goto error;
   };
  
-  if(SQLCIPHER_FLAG_GET(ctx->flags, CIPHER_FLAG_HMAC) && (mode == CIPHER_ENCRYPT)) {
+  if(SQLCIPHER_FLAG_GET(ctx->flags, CIPHER_FLAG_HMAC) && (mode == SQLCIPHER_ENCRYPT)) {
     if(sqlcipher_page_hmac(ctx, c_ctx, pgno, out_start, size + ctx->iv_sz, hmac_out) != SQLITE_OK) {
       sqlcipher_log(SQLCIPHER_LOG_ERROR, SQLCIPHER_LOG_CORE, "%s: hmac operation on encrypt failed for pgno=%d", __func__, pgno);
       goto error;
@@ -3268,7 +3265,7 @@ static void* sqlite3Codec(void *iCtx, void *data, Pgno pgno, int mode) {
       if(pgno == 1) /* copy initial part of file header or SQLite magic to buffer */ 
         memcpy(ctx->buffer, ctx->plaintext_header_sz ? pData : (void *) SQLITE_FILE_HEADER, offset); 
 
-      rc = sqlcipher_page_cipher(ctx, cctx, pgno, CIPHER_DECRYPT, ctx->page_sz - offset, pData + offset, (unsigned char*)ctx->buffer + offset);
+      rc = sqlcipher_page_cipher(ctx, cctx, pgno, SQLCIPHER_DECRYPT, ctx->page_sz - offset, pData + offset, (unsigned char*)ctx->buffer + offset);
 #ifdef SQLCIPHER_TEST
       if((cipher_test_flags & TEST_FAIL_DECRYPT) > 0 && sqlcipher_get_test_fail()) {
         rc = SQLITE_ERROR;
@@ -3309,7 +3306,7 @@ static void* sqlite3Codec(void *iCtx, void *data, Pgno pgno, int mode) {
         }
         memcpy(ctx->buffer, ctx->plaintext_header_sz ? pData : kdf_salt, offset);
       }
-      rc = sqlcipher_page_cipher(ctx, cctx, pgno, CIPHER_ENCRYPT, ctx->page_sz - offset, pData + offset, (unsigned char*)ctx->buffer + offset);
+      rc = sqlcipher_page_cipher(ctx, cctx, pgno, SQLCIPHER_ENCRYPT, ctx->page_sz - offset, pData + offset, (unsigned char*)ctx->buffer + offset);
 #ifdef SQLCIPHER_TEST
       if((cipher_test_flags & TEST_FAIL_ENCRYPT) > 0 && sqlcipher_get_test_fail()) {
         rc = SQLITE_ERROR;
