@@ -36,6 +36,7 @@
 #define SQLCIPHER_H
 
 #include "sqlite3.h"
+#include "sqliteInt.h"
 
 #define SQLCIPHER_DECRYPT 0
 #define SQLCIPHER_ENCRYPT 1

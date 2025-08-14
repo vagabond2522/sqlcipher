@@ -31,11 +31,6 @@
 /* BEGIN SQLCIPHER */
 #ifdef SQLITE_HAS_CODEC
 
-#include "sqliteInt.h"
-#include "btreeInt.h"
-#include "pager.h"
-#include "vdbeInt.h"
-
 #if !defined(SQLCIPHER_OMIT_LOG_DEVICE)
 #if defined(__ANDROID__)
 #include <android/log.h>
@@ -64,6 +59,9 @@
 
 #include <assert.h>
 #include "sqlcipher.h"
+#include "btreeInt.h"
+#include "pager.h"
+#include "vdbeInt.h"
 
 #if !defined(SQLITE_EXTRA_INIT) || !defined(SQLITE_EXTRA_SHUTDOWN)
 #error "SQLCipher must be compiled with -DSQLITE_EXTRA_INIT=sqlcipher_extra_init -DSQLITE_EXTRA_SHUTDOWN=sqlcipher_extra_shutdown"
