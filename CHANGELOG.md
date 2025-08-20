@@ -4,6 +4,7 @@ Notable changes to this project are documented in this file.
 ## [4.11.0] - (? 2025 - [4.11.0 changes])
 - Converts log output to UTF-16 when writing to stdout or stderr on Windows
 - Fixes scope issues to allow --disable-amalgamation to work properly
+- Removes CocoaPods support (SQLCipher.podspec.json)
 
 ## [4.10.0] - (August 2025 - [4.10.0 changes])
 - Updates baseline to SQLite 3.50.4
