@@ -73,6 +73,7 @@ static int sqlcipher_ltc_add_random(void *ctx, const void *buffer, int length) {
 
 static int sqlcipher_ltc_activate(void *ctx) {
   unsigned char random_buffer[FORTUNA_MAX_SZ];
+  int bytes = 0;
 
   sqlcipher_log(SQLCIPHER_LOG_TRACE, SQLCIPHER_LOG_MUTEX, "sqlcipher_ltc_activate: entering SQLCIPHER_MUTEX_PROVIDER_ACTIVATE");
   sqlite3_mutex_enter(sqlcipher_mutex(SQLCIPHER_MUTEX_PROVIDER_ACTIVATE));
@@ -94,8 +95,9 @@ static int sqlcipher_ltc_activate(void *ctx) {
   ltc_ref_count++;
 
 #ifndef SQLCIPHER_TEST
-  sqlite3_randomness(FORTUNA_MAX_SZ, random_buffer);
+  bytes = rng_get_bytes(random_buffer, FORTUNA_MAX_SZ, NULL);
 #endif
+  sqlcipher_log(SQLCIPHER_LOG_TRACE, SQLCIPHER_LOG_PROVIDER, "sqlcipher_ltc_activate: seeded fortuna with %d bytes from rng_get_bytes", bytes);
 
   if(sqlcipher_ltc_add_random(ctx, random_buffer, FORTUNA_MAX_SZ) != SQLITE_OK) {
     return SQLITE_ERROR;
