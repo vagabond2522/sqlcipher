@@ -475,11 +475,11 @@ int sqlcipher_extra_init(const char* arg) {
     while(private_heap_sz >= SQLCIPHER_PRIVATE_HEAP_SIZE_STEP) {
       /* attempt to allocate the private heap. If allocation fails, reduce the size and try again */
       if((private_heap = sqlcipher_internal_malloc(private_heap_sz))) {
-        xoshiro_randomness(private_heap, private_heap_sz);
+        xoshiro_randomness(private_heap, (int) private_heap_sz);
         /* initialize the head block of the linked list at the start of the heap */ 
         private_block *head = (private_block *) private_heap; 
         head->is_used = 0;
-        head->size = private_heap_sz - sizeof(private_block);
+        head->size = (u32) private_heap_sz - sizeof(private_block);
         head->next = NULL;
         break;
       }
@@ -542,7 +542,7 @@ int sqlcipher_extra_init(const char* arg) {
       sqlcipher_log(SQLCIPHER_LOG_ERROR, SQLCIPHER_LOG_MEMORY, "%s: failed to allocate shield mask", __func__); 
       goto error; 
     }
-    if((rc = default_provider->random(provider_ctx, sqlcipher_shield_mask, sqlcipher_shield_mask_sz)) != SQLITE_OK) {
+    if((rc = default_provider->random(provider_ctx, sqlcipher_shield_mask, (int) sqlcipher_shield_mask_sz)) != SQLITE_OK) {
       sqlcipher_log(SQLCIPHER_LOG_ERROR, SQLCIPHER_LOG_MEMORY, "%s: failed to generate requisite random mask data %d", __func__, rc); 
       goto error; 
     }
@@ -2282,7 +2282,7 @@ static int sqlcipher_fprintf(FILE* stream, const char* format, ...) {
     if (wbuffer == NULL) return NULL;
 
     sz = MultiByteToWideChar(CP_UTF8, 0, buffer, sz, wbuffer, sz);
-    wbuffer[sz] = NULL;
+    wbuffer[sz] = (wchar_t) 0;
     fputws(wbuffer, stream);
 
     sqlite3_free(wbuffer);
