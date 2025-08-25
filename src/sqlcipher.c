@@ -2279,7 +2279,7 @@ static int sqlcipher_fprintf(FILE* stream, const char* format, ...) {
     sz = (int)strlen(buffer);
 
     wbuffer = sqlite3_malloc((sz + 1) * sizeof(wchar_t));
-    if (wbuffer == NULL) return NULL;
+    if (wbuffer == NULL) return -1;
 
     sz = MultiByteToWideChar(CP_UTF8, 0, buffer, sz, wbuffer, sz);
     wbuffer[sz] = (wchar_t) 0;
