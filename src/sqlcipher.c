@@ -397,11 +397,11 @@ static void sqlcipher_fini(void) {
   }
   #endif
 #elif defined(__APPLE__)
-  #if !defined(__has_feature) || !__has_feature(address_sanitizer)
-  static void (*const sqlcipher_fini_func)(void) __attribute__((used, section("__DATA,__mod_term_func"))) = sqlcipher_fini;
-  #else
+  #if defined(__has_feature) && __has_feature(address_sanitizer)
   static void sqlcipher_cleanup_destructor(void) __attribute__((destructor));
   static void sqlcipher_cleanup_destructor(void) { sqlcipher_fini(); }
+  #else
+  static void (*const sqlcipher_fini_func)(void) __attribute__((used, section("__DATA,__mod_term_func"))) = sqlcipher_fini;
   #endif
 #else
 static void (*const sqlcipher_fini_func)(void) __attribute__((used, section(".fini_array"))) = sqlcipher_fini;
