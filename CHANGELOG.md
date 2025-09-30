@@ -1,11 +1,16 @@
 # SQLCipher Change Log
 Notable changes to this project are documented in this file.
 
-## [4.11.0] - (? 2025 - [4.11.0 changes])
+## [4.11.0] - (October 2025 - [4.11.0 changes])
 - Converts log output to UTF-16 when writing to stdout or stderr on Windows
 - Fixes scope issues to allow --disable-amalgamation to work properly
 - Replaces fortuna seeding mechanism for libtomcrypt with rng_get_bytes()
 - Removes CocoaPods support (SQLCipher.podspec.json)
+- Fixes includes and macros to support non-amalgamated builds
+- Fixes check for __has_feature to resolve issue with compilers that don't support it
+- Corrects return value from sqlcipher_fprintf
+- Fixes use of provider free_ctx
+- Fixes some compiler warnings
 
 ## [4.10.0] - (August 2025 - [4.10.0 changes])
 - Updates baseline to SQLite 3.50.4
